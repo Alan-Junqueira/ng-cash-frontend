@@ -9,9 +9,9 @@ interface IRequireAuth {
 
 const RequireAuth = ({ children }: IRequireAuth) => {
   // const { isTokenValid } = useContext(UserContext);
+  const isTokenValid = true;
 
-  const isTokenValid = true
-  console.log("AUTH_ROUTE", isTokenValid)
+  // console.log('AUTH_ROUTE', isTokenValid);
 
   return isTokenValid ? children : <Navigate to={'/login'} />;
 };

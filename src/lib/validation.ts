@@ -9,9 +9,7 @@ export const validateToken = async (token: string): Promise<boolean> => {
       }
     });
 
-    console.log("Validation.ts", validation.data)
-
-
+    // console.log("Validation.ts", validation.data)
     if (validation.data) {
       return true
     } else {

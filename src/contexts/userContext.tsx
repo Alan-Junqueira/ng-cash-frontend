@@ -61,13 +61,8 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
       }
     });
 
-    if (balance) {
-      if (balance.data.status) {
-        setAccountBalance(balance.data.balance);
-        console.log('Saldo ok');
-      }
-    } else {
-      console.log('Sem saldo');
+    if (balance && balance.data.status) {
+      setAccountBalance(balance.data.balance);
     }
   }
 
@@ -81,15 +76,11 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
       }
     });
 
-    if (userData) {
-      if (userData.data.status) {
-        const { accountId, id, username } = userData.data.user;
-        setId(id);
-        setAccountId(accountId);
-        setUsername(username);
-      }
-    } else {
-      console.log('getUserData - context: Erro ao pegar os dados do usuário');
+    if (userData && userData.data.status) {
+      const { accountId, id, username } = userData.data.user;
+      setId(id);
+      setAccountId(accountId);
+      setUsername(username);
     }
   }
 
@@ -107,7 +98,6 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
     );
 
     if (transactions) {
-      console.log('TRANSACTIONS', transactions);
       setTransactionsMade(transactions.data.transactionsMade);
       setTransactionsReceived(transactions.data.transactionsReceived);
     }
@@ -122,7 +112,6 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
       localStorageToken?.length > 0
     ) {
       let tokenValidation = await validateToken(localStorageToken);
-      console.log('CONTEXT - tokenValidation', tokenValidation);
 
       if (tokenValidation) {
         setIsTokenValid(tokenValidation);

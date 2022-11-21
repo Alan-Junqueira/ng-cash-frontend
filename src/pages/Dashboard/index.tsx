@@ -31,8 +31,6 @@ const TransactionFormShcema = z.object({
 type ITransactionForm = z.infer<typeof TransactionFormShcema>;
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-
   const {
     accountId,
     token,
@@ -170,11 +168,8 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    console.log("SETTIMEOUT", transactionsReceived);
-      sortTransactionsByDate();
+    sortTransactionsByDate();
   }, [transactionsMade, transactionsReceived]);
-
-  console.log("Fora do SetTimeOut", transactionsReceived);
 
   const {
     register,
@@ -216,27 +211,37 @@ const Dashboard = () => {
     <>
       <Header />
       <DashboardContainer>
-        <TransferenceForm onSubmit={handleSubmit(handleFormTransactionSubmit)}>
-          <TransferenceFormTitle>Transferência</TransferenceFormTitle>
-          <TransferenceFormSubtite>
-            Deseja fazer uma transferência?
-          </TransferenceFormSubtite>
-          <span>Transfira da conta</span>
-          <input type="text" value={username} disabled />
-          <label htmlFor="cashInAccountUsername">Para a conta:</label>
-          <input
-            type="text"
-            id="cashInAccountUsername"
-            placeholder="Conta de recebimento"
-            {...register('cashInAccountUsername')}
-          />
-          <label htmlFor="cashIn">
-            <span>Valor</span>
-            <span>Saldo: {accountBalance} </span>
-          </label>
-          <input id="cashIn" type="number" min={1} {...register('cashIn')} />
-          <button type="submit">Transferir</button>
-        </TransferenceForm>
+        <section>
+          <TransferenceForm
+            onSubmit={handleSubmit(handleFormTransactionSubmit)}
+          >
+            <TransferenceFormTitle>Transferência</TransferenceFormTitle>
+            <TransferenceFormSubtite>
+              Deseja fazer uma transferência?
+            </TransferenceFormSubtite>
+            <span>Transfira da conta</span>
+            <input type="text" value={username} disabled />
+            <label htmlFor="cashInAccountUsername">Para a conta:</label>
+            <input
+              type="text"
+              id="cashInAccountUsername"
+              placeholder="Conta de recebimento"
+              {...register('cashInAccountUsername')}
+            />
+            <label htmlFor="cashIn">
+              <span>Valor</span>
+              <span>Saldo: {accountBalance} </span>
+            </label>
+            <input id="cashIn" type="number" min={1} {...register('cashIn')} />
+            <button type="submit">Transferir</button>
+          </TransferenceForm>
+
+          <div>
+            <h1>A carteira da nova geração.</h1>
+            <h2>É para todas as idades!</h2>
+          </div>
+        </section>
+
         <TransactionsTable>
           <TransactionsTableHead>
             <tr>
