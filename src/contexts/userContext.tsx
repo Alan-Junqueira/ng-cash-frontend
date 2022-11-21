@@ -1,15 +1,32 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
+import { api } from '../lib/axios';
 import { validateToken } from '../lib/validation';
 
+export interface IUserTransactions {
+  date: any;
+  createdAt: any;
+  updatedAt: any;
+  creditedAccountId: number;
+  debitedAccountId: number;
+  id: number;
+  value: number;
+}
 export interface IUserContext {
   id: number;
   token: string;
   accountId: number;
   username: string;
+  isTokenValid: boolean;
+  accountBalance: number;
+  transactionsMade: IUserTransactions[];
+  transactionsReceived: IUserTransactions[];
   changeUserId: (id: number) => void;
   changeUserToken: (token: string) => void;
   changeAccountId: (id: number) => void;
   changeUsername: (username: string) => void;
+  changeTokenValidationToFalse: () => void;
+  getUserTransactions: (token: string) => Promise<void>;
+  getAccountBalance: (token: string) => Promise<void>;
 }
 
 export const UserContext = createContext({} as IUserContext);
@@ -24,47 +41,133 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
   const [accountId, setAccountId] = useState(0);
   const [username, setUsername] = useState('');
   const [isTokenValid, setIsTokenValid] = useState(false);
+  const [accountBalance, setAccountBalance] = useState(0);
 
-  async function validateTokenLocaly() {
-    let localStorageToken = localStorage.getItem('ng-cash-v:1.0.0');
+  // User Transactions
+  const [transactionsMade, setTransactionsMade] = useState<IUserTransactions[]>(
+    []
+  );
+  const [transactionsReceived, setTransactionsReceived] = useState<
+    IUserTransactions[]
+  >([]);
 
-    if (localStorageToken !== null) {
-      let isTokenValid = await validateToken(localStorageToken);
-
-      if (isTokenValid) {
-        setIsTokenValid(isTokenValid);
-        return true;
-      } else {
-        setIsTokenValid(false);
-        return false;
+  async function getAccountBalance(token: string) {
+    const balance = await api.post('accounts/balance/', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        token
       }
+    });
+
+    if (balance) {
+      if (balance.data.status) {
+        setAccountBalance(balance.data.balance);
+        console.log('Saldo ok');
+      }
+    } else {
+      console.log('Sem saldo');
     }
   }
 
-  useEffect(() => {
-    validateTokenLocaly();
-    console.log(isTokenValid)
-  }, [token]);
+  async function getUserData(token: string) {
+    const userData = await api.post(`/users/getByToken/`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        token
+      }
+    });
+
+    if (userData) {
+      if (userData.data.status) {
+        const { accountId, id, username } = userData.data.user;
+        setId(id);
+        setAccountId(accountId);
+        setUsername(username);
+      }
+    } else {
+      console.log('getUserData - context: Erro ao pegar os dados do usuário');
+    }
+  }
+
+  async function getUserTransactions(token: string) {
+    const transactions = await api.post(
+      'transactions/get-all-user-transactions/',
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: {
+          token
+        }
+      }
+    );
+
+    if (transactions) {
+      console.log('TRANSACTIONS', transactions);
+      setTransactionsMade(transactions.data.transactionsMade);
+      setTransactionsReceived(transactions.data.transactionsReceived);
+    }
+  }
+
+  async function getTokenValidationAndUserData(
+    localStorageToken: string | null
+  ) {
+    if (
+      localStorageToken !== null &&
+      localStorageToken !== undefined &&
+      localStorageToken?.length > 0
+    ) {
+      let tokenValidation = await validateToken(localStorageToken);
+      console.log('CONTEXT - tokenValidation', tokenValidation);
+
+      if (tokenValidation) {
+        setIsTokenValid(tokenValidation);
+        setToken(localStorageToken);
+
+        getAccountBalance(localStorageToken);
+
+        getUserData(localStorageToken);
+
+        getUserTransactions(localStorageToken);
+      } else {
+        setIsTokenValid(false);
+        console.log('token não foi validado');
+      }
+    } else {
+      console.log('Token Inválido');
+    }
+  }
 
   function changeUserId(id: number) {
     setId(id);
-    return;
   }
 
   function changeUserToken(token: string) {
+    localStorage.setItem('ng-cash-v:1.0.0', token);
     setToken(token);
-    return;
   }
 
   function changeAccountId(id: number) {
     setAccountId(id);
-    return;
   }
 
   function changeUsername(username: string) {
     setUsername(username);
-    return;
   }
+
+  function changeTokenValidationToFalse() {
+    setIsTokenValid(false);
+    localStorage.removeItem('ng-cash-v:1.0.0');
+  }
+
+  useEffect(() => {
+    const localStorageToken = localStorage.getItem('ng-cash-v:1.0.0');
+    getTokenValidationAndUserData(localStorageToken);
+  }, []);
 
   return (
     <UserContext.Provider
@@ -76,7 +179,14 @@ export const UserContextProvider = ({ children }: IUserContextProvider) => {
         changeUserId,
         changeUserToken,
         changeAccountId,
-        changeUsername
+        changeUsername,
+        isTokenValid,
+        changeTokenValidationToFalse,
+        accountBalance,
+        transactionsMade,
+        transactionsReceived,
+        getUserTransactions,
+        getAccountBalance
       }}
     >
       {children}

@@ -7,14 +7,14 @@ import { defaultTheme } from './styles/themes/default';
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <ThemeProvider theme={defaultTheme}>
-        <GlobalStyle />
-        <UserContextProvider>
+    <UserContextProvider>
+      <BrowserRouter>
+        <ThemeProvider theme={defaultTheme}>
+          <GlobalStyle />
           <Router />
-        </UserContextProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+        </ThemeProvider>
+      </BrowserRouter>
+    </UserContextProvider>
   );
 };
 

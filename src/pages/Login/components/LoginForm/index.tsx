@@ -1,9 +1,9 @@
-import { SyntheticEvent, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { SyntheticEvent, useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { SignIn } from 'phosphor-react';
+import { SignIn, User } from 'phosphor-react';
 
 import { Eye } from '../../../../assets/Eye';
 import { LockSimple } from '../../../../assets/LockSimple';
@@ -22,6 +22,7 @@ import {
 } from './styled';
 import { useForm } from 'react-hook-form';
 import { api } from '../../../../lib/axios';
+import { UserContext } from '../../../../contexts/userContext';
 
 const loginSchema = z.object({
   username: z.string(),
@@ -31,19 +32,21 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
+  const navigate = useNavigate();
+
+  //* CONTEXT
+  const {
+    changeAccountId,
+    changeUserId,
+    changeUserToken,
+    changeUsername,
+    token
+  } = useContext(UserContext);
+
   //* Icons
   const [eyeColor, setEyeColor] = useState('#AFB6C2');
   const [lockColor, setLockColor] = useState('#AFB6C2');
   const [envelopeColor, setEnvelopeColor] = useState('#AFB6C2');
-
-  //* REQUESTS
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    setToken(localStorage.getItem('ng-cash-v:1.0.0'));
-
-    console.log(token);
-  }, [token]);
 
   const {
     register,
@@ -89,22 +92,18 @@ export const LoginForm = () => {
         }
       });
 
-      const {
-        user,
-        status,
-        message
-      } = response.data;
+      const { user, status, message } = response.data;
 
-      console.log(user)
-      const {token, accountId, username: loggedUsername, id} = user
+      const { token, accountId, username: loggedUsername, id } = user;
 
       if (status) {
-        localStorage.setItem('ng-cash-v:1.0.0', user.token);
-        setToken(response.data.token);
+        changeAccountId(accountId);
+        changeUserId(id);
+        changeUserToken(token);
+        changeUsername(loggedUsername);
+        alert(message);
 
-        return alert(message);
-      } else {
-        return alert('Erro ao fazer login');
+        navigate('/');
       }
     } catch (error: any) {
       let requestMessage = error.response.data.message;
@@ -121,7 +120,7 @@ export const LoginForm = () => {
       <label htmlFor="username">Usuário</label>
       <InputUserContainer envelopeColor={envelopeColor}>
         <span>
-          <Envelope />
+          <User size={20} weight='bold'/>
         </span>
         <InputUser
           id="username"
@@ -145,7 +144,7 @@ export const LoginForm = () => {
           onFocus={() => setLockColor('#FFC632')}
           onBlur={() => setLockColor('#AFB6C2')}
         />
-        <button onClick={handleEyeClick}>
+        <button type="button" onClick={handleEyeClick}>
           <Eye />
         </button>
       </InputPasswordContainer>

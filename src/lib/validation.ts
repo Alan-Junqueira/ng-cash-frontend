@@ -9,11 +9,10 @@ export const validateToken = async (token: string): Promise<boolean> => {
       }
     });
 
-    console.log(validation.data)
+    console.log("Validation.ts", validation.data)
 
 
     if (validation.data) {
-      console.log('validou')
       return true
     } else {
       console.log('naõ validou')
@@ -22,6 +21,4 @@ export const validateToken = async (token: string): Promise<boolean> => {
   } catch (error) {
     return false
   }
-
-
 }

@@ -108,7 +108,7 @@ export const InputUserContainer = styled.div<IInputUserContainer>`
       color: ${(props) => props.envelopeColor};
     }
   }
-`;
+`
 
 export const InputUser = styled(DefaultInput)`
   margin-bottom: 20px;
