@@ -11,43 +11,6 @@ export const DashboardContainer = styled.main`
   gap: 2rem;
   justify-content: space-between;
   flex-direction: column;
-
-  section {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-
-    &::before {
-      content: '';
-      top: 0;
-      left: 0;
-      position: absolute;
-      width: 100vw;
-      height: calc(100vh + 2rem);
-      background-image: linear-gradient(
-        324deg,
-        rgba(1, 1, 11, 1) 0%,
-        rgba(13, 13, 22, 1) 35%,
-        rgba(37, 39, 40, 1) 100%
-      );
-      background-repeat: no-repeat;
-      background-size: cover;
-
-      z-index: -1;
-    }
-
-    h1 {
-      font-weight: bold;
-      font-size: 2rem;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-    }
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 300;
-    }
-  }
 `;
 
 export const TransferenceForm = styled.form`
@@ -56,6 +19,7 @@ export const TransferenceForm = styled.form`
   width: 100%;
   max-width: 570px;
   max-height: 530px;
+
   padding: 50px 120px;
   border-radius: 8px;
 
